@@ -1047,13 +1047,14 @@ export default ({
     onUpdate={(e)=>{handleInterfaceSourceChange(e)}}
     restrictDelete= {true}
     restrictAdd= {true} 
-     restrictTypeSelection={ ({ path, value, key }) => {
-              if (key=="type") return 
-              if (path.includes('user')) return ['string', 'number', 'boolean']
-              if (typeof value === 'boolean') return false
-              if (typeof value === 'string') return ['string', 'object']
-              return ['string', 'number', 'boolean', 'array', 'object'] // no "null"
-            } }
+    onChange = {({ newValue, name }) => {
+      if (name === "type" && newValue != "datastream" || newValue!="properties" ){
+return "properties"
+     
+      }
+      return newValue 
+
+    }}
  />
             <Form.Control.Feedback type="invalid">{interfaceSourceError}</Form.Control.Feedback>
           </Form.Group>
