@@ -17,6 +17,8 @@
 */
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { JsonEditor } from 'json-edit-react'
+
 import {
   Accordion,
   Badge,
@@ -384,7 +386,7 @@ export default ({
   const [interfaceDraft, setInterfaceDraft] = useState<AstarteInterface>(
     initialData || defaultInterface,
   );
-  const [interfaceSource, setInterfaceSource] = useState(
+  let [interfaceSource, setInterfaceSource] = useState(
     formatJSON(AstarteInterface.toJSON(interfaceDraft)),
   );
   const [datastreamOptions, setDatastreamOptions] = useState<DatastreamOptions>(
@@ -601,8 +603,9 @@ export default ({
   );
 
   const handleInterfaceSourceChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = e.target;
+    (e: any) => {
+      const  value  = JSON.stringify(e.newData);
+   
       setInterfaceSource(value);
       if (!checkValidJSONText(value)) {
         return;
@@ -1027,7 +1030,7 @@ export default ({
       {isSourceVisible && (
         <Col md={6}>
           <Form.Group controlId="interfaceSource" className="h-100 d-flex flex-column">
-            <Form.Control
+            {/* <Form.Control
               as="textarea"
               className="flex-grow-1 font-monospace"
               value={interfaceSource}
@@ -1036,7 +1039,22 @@ export default ({
               required
               isValid={isValidInterfaceSource}
               isInvalid={!isValidInterfaceSource}
-            />
+            /> */}
+             <JsonEditor
+             className="flex-grow-1 font-monospace"
+           
+    data={ JSON.parse(interfaceSource) }
+    onUpdate={(e)=>{handleInterfaceSourceChange(e)}}
+    restrictDelete= {true}
+    restrictAdd= {true} 
+     restrictTypeSelection={ ({ path, value, key }) => {
+              if (key=="type") return 
+              if (path.includes('user')) return ['string', 'number', 'boolean']
+              if (typeof value === 'boolean') return false
+              if (typeof value === 'string') return ['string', 'object']
+              return ['string', 'number', 'boolean', 'array', 'object'] // no "null"
+            } }
+ />
             <Form.Control.Feedback type="invalid">{interfaceSourceError}</Form.Control.Feedback>
           </Form.Group>
         </Col>
